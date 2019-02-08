@@ -66,11 +66,9 @@ class ASCIIListener:
 
     async def _handle_message(self, raw):
         msg = raw.split(',')
+        self._flag = True
         if msg[0] == 'DC' and self._async_message_callback is not None:
             await self._async_message_callback(msg[1], msg[2])
-        elif msg[0] == 'error':
-            _LOGGER.debug('Ping response received')
-            self._flag = True
         else:
             _LOGGER.debug('HomeSeer unhandled ASCII message type received: {}'.format(msg[0]))
 
@@ -92,7 +90,7 @@ class ASCIIListener:
                     _LOGGER.debug('Sending ping...')
                     self._writer.write('vr\r\n'.encode())
                     await self._writer.drain()
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(120)
                 else:
                     _LOGGER.debug('Ping timeout, closing ASCII connection')
                     self._writer.close()

@@ -10,8 +10,10 @@ class HomeSeerDevice:
         self._control_data = control_data
         self._request = request
         self._value = self._raw['value']
-        self.on_value = None
+        self._on_value = None
         self._off_value = None
+        self._lock_value = None
+        self._unlock_value = None
         self._value_update_callback = None
         self._suppress_value_update_callback = False
         self._get_control_values()
@@ -47,9 +49,13 @@ class HomeSeerDevice:
                 for pair in control_pairs:
                     control_use = pair['ControlUse']
                     if control_use == 1:
-                        self.on_value = pair['ControlValue']
+                        self._on_value = pair['ControlValue']
                     elif control_use == 2:
                         self._off_value = pair['ControlValue']
+                    elif control_use == 18:
+                        self._lock_value = pair['ControlValue']
+                    elif control_use == 19:
+                        self._unlock_value = pair['ControlValue']
                 break
 
     def register_update_callback(self, callback, suppress_on_reconnect=False):
