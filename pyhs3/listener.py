@@ -16,6 +16,8 @@ class ASCIIListener:
         self._async_message_callback = kwargs.get('async_message_callback')
         self._async_disconnection_callback = kwargs.get('async_disconnection_callback')
         self._async_reconnection_callback = kwargs.get('async_connection_callback')
+        self._username = kwargs.get('username')
+        self._password = kwargs.get('password')
         self._reader = None
         self._writer = None
         self._reconnect_flag = False
@@ -36,6 +38,9 @@ class ASCIIListener:
             self._reader, self._writer = await asyncio.wait_for(connection, timeout=3)
             _LOGGER.info('HomeSeer ASCII Listener connected to {}:{}'.format(self._host, self._port))
             self._state = STATE_LISTENING
+
+            if not await self._login():
+                raise Exception('Error logging in to ASCII listener')
 
             self._flag = True
             asyncio.get_event_loop().create_task(self._pinger())
@@ -64,13 +69,33 @@ class ASCIIListener:
             _LOGGER.error('HomeSeer ASCII listener error: {}'.format(err))
             await self._handle_disconnect()
 
+    async def _login(self):
+        if self._writer is None:
+            return False
+
+        auth = 'au,{},{}\r\n'.format(self._username, self._password).encode()
+        _LOGGER.debug('HomeSeer ASCII logging in with user {} and pass {}'.format(
+            self._username, self._password))
+        self._writer.write(auth)
+
+        try:
+            msg = await asyncio.wait_for(self._reader.readline(), timeout=3)
+            if msg.decode().strip() == 'ok':
+                _LOGGER.debug('HomeSeer ASCII login ok')
+            else:
+                _LOGGER.debug('HomeSeer ASCII login error: bad user or pass')
+            return True
+        except asyncio.TimeoutError:
+            _LOGGER.error('HomeSeer ASCII login timeout')
+            return False
+
     async def _handle_message(self, raw):
         msg = raw.split(',')
         self._flag = True
         if msg[0] == 'DC' and self._async_message_callback is not None:
             await self._async_message_callback(msg[1], msg[2])
         else:
-            _LOGGER.debug('HomeSeer unhandled ASCII message type received: {}'.format(msg[0]))
+            _LOGGER.debug('HomeSeer unhandled ASCII message type received: {}'.format(msg[0].strip()))
 
     async def _handle_disconnect(self):
         self._reconnect_flag = True

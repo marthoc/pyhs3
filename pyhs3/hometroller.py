@@ -27,7 +27,8 @@ class HomeTroller:
         self._http_port = http_port
         self._ascii_port = ascii_port
         self._http_timeout = http_timeout
-        self._listener = ASCIIListener(self._host, ascii_port=self._ascii_port,
+        self._listener = ASCIIListener(self._host, username=self._username, password=self._password,
+                                       ascii_port=self._ascii_port,
                                        async_message_callback=self._update_device_value,
                                        async_connection_callback=self.refresh_devices,
                                        async_disconnection_callback=self._disconnect_callback)
