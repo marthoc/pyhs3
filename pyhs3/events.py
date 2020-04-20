@@ -8,16 +8,12 @@ class HomeSeerEvent:
 
     @property
     def group(self):
-        return self._raw['Group']
+        return self._raw["Group"]
 
     @property
     def name(self):
-        return self._raw['Name']
+        return self._raw["Name"]
 
     async def run(self):
-        json = {
-            'action': 'runevent',
-            'group': self.group,
-            'name': self.name
-        }
-        await self._request('post', json=json)
+        json = {"action": "runevent", "group": self.group, "name": self.name}
+        await self._request("post", json=json)
