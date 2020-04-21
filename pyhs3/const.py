@@ -6,7 +6,6 @@ _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_ASCII_PORT = 11000
 DEFAULT_HTTP_PORT = 80
-DEFAULT_HTTP_TIMEOUT = 3
 DEFAULT_PASSWORD = "default"
 DEFAULT_USERNAME = "default"
 

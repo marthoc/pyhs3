@@ -4,14 +4,12 @@ Allows sending commands via JSON API and listening for device changes via ASCII 
 """
 
 from asyncio import TimeoutError
-
-from aiohttp import ContentTypeError
+from aiohttp import BasicAuth, ContentTypeError
 
 from .const import (
     _LOGGER,
     DEFAULT_ASCII_PORT,
     DEFAULT_HTTP_PORT,
-    DEFAULT_HTTP_TIMEOUT,
     DEFAULT_PASSWORD,
     DEFAULT_USERNAME,
     REASON_DISCONNECTED,
@@ -32,19 +30,16 @@ class HomeTroller:
         password=DEFAULT_PASSWORD,
         http_port=DEFAULT_HTTP_PORT,
         ascii_port=DEFAULT_ASCII_PORT,
-        http_timeout=DEFAULT_HTTP_TIMEOUT,
     ):
         self._host = host
         self._websession = websession
-        self._username = username
-        self._password = password
+        self._auth = BasicAuth(username, password)
         self._http_port = http_port
         self._ascii_port = ascii_port
-        self._http_timeout = http_timeout
         self._listener = ASCIIListener(
             self._host,
-            username=self._username,
-            password=self._password,
+            username=username,
+            password=password,
             ascii_port=self._ascii_port,
             async_message_callback=self._update_device_value,
             async_connection_callback=self.refresh_devices,
@@ -71,13 +66,11 @@ class HomeTroller:
 
     async def _request(self, method, params=None, json=None):
         """Make an API request"""
-        url = "http://{}:{}@{}:{}/JSON".format(
-            self._username, self._password, self._host, self._http_port
-        )
+        url = f"http://{self._host}:{self._http_port}/JSON"
 
         try:
             async with self._websession.request(
-                method, url, params=params, json=json, timeout=self._http_timeout
+                method, url, params=params, json=json, auth=self._auth,
             ) as result:
                 result.raise_for_status()
                 _LOGGER.debug(f"HomeSeer request response: {await result.text()}")
@@ -165,5 +158,6 @@ class HomeTroller:
                 )
             except KeyError:
                 _LOGGER.debug(
-                    f"HomeSeer refresh data retrieved for unsupported device type: {device['device_type_string']} ({device['ref']})"
+                    f"HomeSeer refresh data retrieved for unsupported device type: "
+                    f"{device['device_type_string']} ({device['ref']})"
                 )
