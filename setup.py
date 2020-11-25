@@ -4,7 +4,7 @@ long_description = open('README.md').read()
 
 setuptools.setup(
     name="pyhs3",
-    version="0.11",
+    version="0.12",
     author="Mark Coombes",
     author_email="mark@markcoombes.ca",
     description="Python3 async library for interacting with HomeSeer HS3",

@@ -52,6 +52,7 @@ class HomeSeerDevice:
                 control_pairs = item["ControlPairs"]
                 for pair in control_pairs:
                     control_use = pair["ControlUse"]
+                    control_label = pair["Label"]
                     if control_use == 1:
                         self._on_value = pair["ControlValue"]
                     elif control_use == 2:
@@ -59,6 +60,10 @@ class HomeSeerDevice:
                     elif control_use == 18:
                         self._lock_value = pair["ControlValue"]
                     elif control_use == 19:
+                        self._unlock_value = pair["ControlValue"]
+                    elif control_label == "Lock":
+                        self._lock_value = pair["ControlValue"]
+                    elif control_label == "Unlock":
                         self._unlock_value = pair["ControlValue"]
                 break
 
