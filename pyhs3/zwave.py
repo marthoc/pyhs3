@@ -11,6 +11,7 @@ from .const import (
     DEVICE_ZWAVE_OPERATING_STATE,
     DEVICE_ZWAVE_RELATIVE_HUMIDITY,
     DEVICE_ZWAVE_SENSOR_BINARY,
+    DEVICE_ZWAVE_SENSOR_MULTILEVEL,
     DEVICE_ZWAVE_SWITCH,
     DEVICE_ZWAVE_SWITCH_BINARY,
     DEVICE_ZWAVE_SWITCH_MULTILEVEL,
@@ -113,6 +114,11 @@ class ZWaveSensorBinary(HomeSeerDevice):
     pass
 
 
+class ZWaveSensorMultilevel(HomeSeerDevice):
+
+    pass
+
+
 class ZWaveSwitch(HomeSeerDevice):
     @property
     def is_on(self):
@@ -175,6 +181,8 @@ def get_zwave_device(raw, control_data, request):
         return ZWaveRelativeHumidity(raw, control_data, request)
     elif device_type == DEVICE_ZWAVE_SENSOR_BINARY:
         return ZWaveSensorBinary(raw, control_data, request)
+    elif device_type == DEVICE_ZWAVE_SENSOR_MULTILEVEL:
+        return ZWaveSensorMultilevel(raw, control_data, request)
     elif device_type == DEVICE_ZWAVE_SWITCH:
         return ZWaveSwitch(raw, control_data, request)
     elif device_type == DEVICE_ZWAVE_SWITCH_BINARY:

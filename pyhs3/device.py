@@ -1,6 +1,9 @@
 """Models the basic API data for a HomeSeer device."""
 
-from .const import REASON_DISCONNECTED, REASON_RECONNECTED
+from .const import (
+    REASON_DISCONNECTED,
+    REASON_RECONNECTED,
+)
 
 
 class HomeSeerDevice:
@@ -45,6 +48,10 @@ class HomeSeerDevice:
     @property
     def device_type_string(self):
         return self._raw["device_type_string"]
+
+    @property
+    def status(self):
+        return self._raw["status"]
 
     def _get_control_values(self):
         for item in self._control_data:
