@@ -5,6 +5,7 @@ Allows sending commands via JSON API and listening for device changes via ASCII 
 
 from asyncio import TimeoutError
 from aiohttp import BasicAuth, ContentTypeError
+from typing import Union
 
 from .const import (
     _LOGGER,
@@ -63,6 +64,18 @@ class HomeTroller:
     async def stop_listener(self):
         self._listener.state = STATE_STOPPED
         await self._listener.connection_handler()
+
+    async def control_device_by_value(self, ref: int, value: Union[str, int, float]):
+        """
+        Provides an interface for controlling devices by value
+        directly through the HomeTroller object.
+        """
+        params = {
+            "request": "controldevicebyvalue",
+            "ref": ref,
+            "value": value,
+        }
+        await self._request("get", params=params)
 
     async def _request(self, method, params=None, json=None):
         """Make an API request"""
